@@ -24,7 +24,7 @@ const userRoute = require('./routes/user');
 const videoRoute = require('./routes/video');
 const creditcardRoute = require('./routes/creditcard');
 const productRoute = require('./routes/product')
-// Bring in Handlebars Helpers here
+// Bring in Handlebars Helpers hereee
 // Copy and paste this statement only!!
 const { formatDate, radioCheck, replaceCommas } = require('./helpers/hbs');
 
