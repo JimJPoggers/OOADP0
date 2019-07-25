@@ -1,7 +1,6 @@
 module.exports = {
     host: 'localhost',
-    database: 'users',
-    username: 'OOADPBae',
-    password: 'OOADP',
-    
+    database: 'ooadp',
+    username: 'itp211',
+    password: 'itp211'
 }

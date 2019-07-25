@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
-const Quiz = require('../models/Quiz');
 const alertMessage = require('../helpers/messenger');
 var bcrypt = require('bcryptjs');
 const passport = require('passport');
@@ -11,266 +10,124 @@ const sgMail = require('@sendgrid/mail');
 const jwt = require('jsonwebtoken');
 
 
-// Login&Signup Form POST => /user/LoginSignUp
-router.post('/LoginSignUp', (req, res, next) => {
-    //passport.authenticate('local', {
-    //    successRedirect: '/quiz', // Route to /video/listVideos URL
-    //    failureRedirect: '/LoginSignUp', // Route to /login URL
-    //    failureFlash: true
-    /* Setting the failureFlash option to true instructs Passport to flash an error
-    message using the message given by the strategy's verify callback, if any.
-    When a failure occur passport passes the message object as error */
-    //})(req, res, next);
+function sendEmail(userId, email, token) {
+    sgMail.setApiKey("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");
+
+    const message = {
+        to: email,
+        from: 'Do Not Reply <admin@video-jotter.sg>',
+        subject: 'Verify Video Jotter Account',
+        text: 'Video Jotter Email Verification',
+        html: `Thank you registering with Video Jotter.<br><br>
+    Please <a href="http://localhost:5000/user/verify/${userId}/${token}">
+    <strong>verify</strong></a>your account.`
+    };
+    // Returns the promise from SendGrid to the calling function
+    return new Promise((resolve, reject) => {
+        sgMail.send(message)
+            .then(msg => resolve(msg))
+            .catch(err => reject(err));
+    })
+}
+
+// Login Form POST => /user/login
+router.post('/login', (req, res, next) => {
+    passport.authenticate('local', {
+        successRedirect: '/video/listVideos', // Route to /video/listVideos URL
+        failureRedirect: '/showLogin', // Route to /login URL
+        failureFlash: true
+        /* Setting the failureFlash option to true instructs Passport to flash an error
+        message using the message given by the strategy's verify callback, if any.
+        When a failure occur passport passes the message object as error */
+    })(req, res, next);
+});
+
+
+// User register URL using HTTP post => /user/register
+router.post('/register', (req, res) => {
 
     let errors = [];
     // Retrieves fields from register page from request body
-    let { email, password, weight, height } = req.body;
+    let { name, email, password, password2 } = req.body;
 
-    // Signup
+    // Checks if both passwords entered are the same
+    if (password !== password2) {
+        errors.push({ text: 'Passwords do not match' });
+    }
+
+    // Checks that password length is more than 4
+    if (password.length < 4) {
+        errors.push({ text: 'Password must be at least 4 characters' });
+    }
     if (errors.length > 0) {
-        res.render('user/LoginSignUp', {
-            errors
+        res.render('user/register', {
+            errors,
+            name,
+            email,
+            password,
+            password2
         });
     } else {
         // If all is well, checks if user is already registered
         User.findOne({ where: { email: req.body.email } })
             .then(user => {
-                if (user) { 
-                    // If user is found, that means email has already been registered
-                    res.render('user/LoginSignUp', {
-                        error: user.email + ' already registered'
+                if (user) {
+                    // If user is found, that means email has already been
+                    // registered
+                    res.render('user/register', {
+                        error: user.email + ' already registered',
+                        name,
+                        email,
+                        password,
+                        password2
                     });
-                }
-                else {
-                    // Encrypt the password
+                } else {
+                    // Generate JWT token
                     let token;
+                    jwt.sign(email, 's3cr3Tk3y', (err, jwtoken) => {
+                        if (err) console.log('Error generating Token: ' + err);
+                        token = jwtoken;
+                    });
+                    // Encrypt the password
                     var salt = bcrypt.genSaltSync(10);
                     var hashedPassword = bcrypt.hashSync(password, salt);
                     password = hashedPassword;
 
-                    jwt.sign(email, hashedPassword, (err, jwtoken) => {
-                        if (err) {
-                            console.log('Error generating Token: ' + err);
-                        }
-                        token = jwtoken;
-                    });
-
                     // Create new user record
-                    User.create({ email, password, weight, height, verified: 0 })
-                        .then(user => {
-                            sendEmail(user.id, user.email, token)
-                            console.log("User created");
-                            alertMessage(res, 'success', user.email + ' added. Please login to ' +
-                                user.email + ' to verify account.',
-                                'fas fa-sign-in-alt', true);
-                            res.redirect('/LoginSignUp');
-                        })
-                        .catch(err => console.log(err));
+                    // Create new user record
+                    User.create({
+                        name,
+                        email,
+                        password,
+                        verified: 0, // Add this statement – set verify to false
+                    }).then(user => { // Send email after user is inserted into DB
+                        sendEmail(user.id, user.email, token) // Add this to call sendEmail function
+                            .then(msg => { // Send email success
+                                alertMessage(res, 'success', user.name + ' added. Please logon to ' +
+                                    user.email + ' to verify account.',
+                                    'fas fa-sign-in-alt', true);
+                                res.redirect('/showLogin');
+                            }).catch(err => { // Send email fail
+                                alertMessage(res, 'warning', 'Error sending to ' + user.email,
+                                    'fas fa-sign-in-alt', true);
+                                res.redirect('/');
+                            });
+                    }).catch(err => console.log(err));
+
                 }
-        });
+            });
     }
 });
 
 
-// Practical 11 Activity 04
-function sendEmail(userId, email, token) {
-    sgMail.setApiKey('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'); // <Insert your SendGrid API key here>
-
-    const message = {
-        to: email,
-        from: 'Do Not Reply <admin@gmail.com>',
-        subject: 'Verify Email Account',
-        text: 'Email Verification',
-        html: `Thank you for registering with Us.<br><br>
-    Please click <a href="http://localhost:5000/user/verify/${userId}/${token}">
-    <strong> here</strong></a> to verify your account.`
-    };
-    // Returns the promise from SendGrid to the calling function
-    return new Promise((resolve, reject) => {
-        sgMail.send(message)
-            .then(msg =>
-                resolve(msg)).catch(err =>
-                    reject(err)
-                );
-    });
-}
-
-router.post('', (req, res) => {
+router.post('/register', (req, res) => {
     req.logout();
     res.redirect('/');
 });
 
-// router.post('/index', (req, res, next) => {   
-//     User.findOne({
-//         where: {
-//             email: req.body.email
-//         }
-//     }).then(user => {
-
-//         let errors = [];
-//         if (user) {
-//             if (user.verified === false) {
-//                 // user is not yet verified
-//                 errors.push({ text: "User is not yet verified." });
-//                 res.redirect('/LoginSignUp');
-//             } 
-//         } else {
-//             // No user with the input email is found
-//             errors.push({ text: 'No user with the input email is found!' });
-//             res.redirect('/LoginSignUp');
-//         }
-//         if (errors.length > 0) {
-//             email = req.body.email; // Store the Email
-//             password = req.body.password; // Store the Password
-//             // alertMessage(res, 'danger', 'Account is not yet verified. Please verify the account before logging in.', 'fas fa-ban', true);
-//             res.render('user/LoginSignUp', {
-//                 errors, // Show the error
-//                 email, // Populate the email so that user does not need to re-enter the details
-//                 password, // Populate the email so that user does not need to re-enter the password
-//             })
-//         }
-//     }).catch(err => {
-//         console.log(err)
-//     });
-//     res.render('/index'); // need change the routing after combine
-// });
-
-// List user data, not working
-router.get('/Useradmin', (req, res) => {
-	User.findAll({
-		raw: true
-	})
-	.then((user) => {
-		res.render('user/Useradmin', {
-			user
-		});
-	})
-	.catch(err => console.log(err)); // renders views/user/DragnDrop.handlebars
-});
-
-router.post('/addQuiz', (req, res, next) => {
-
-    let question = req.body.question;
-    let choiceA = req.body.choiceA;
-    let choiceB = req.body.choiceB;
-    let choiceC = req.body.choiceC;   
-    let correct = req.body.correct;
-    // let userId = req.user.id;
-
-    Quiz.create({
-        question,
-        choiceA,
-        choiceB,
-        choiceC,
-        correct
-        // ,userId
-    }).then((quizzes) => {
-        res.redirect('/user/QuizData')
-    })
-});
-
-router.get('/QuizData', (req, res) => {
-	Quiz.findAll({
-        // where: {
-        //     userId: req.user.id
-        // },
-		raw: true
-	})
-	.then((quizzes) => {
-		res.render('user/QuizData', {
-			quizzes:quizzes
-		});
-	})
-	.catch(err => console.log(err)); // renders views/user/DragnDrop.handlebars
-});
-
-// Shows edit video page
-router.get('/edit/:id', (req, res) => {
-    Quiz.findOne({
-        where: {
-            id: req.params.id
-        }
-    }).then((quizzes) => {
-
-        if (req.user.id === quizzes.userId) {
-            // call views/video/editVideo.handlebar to render the edit video page
-            res.render('user/editQuiz', {
-                quizzes // passes video object to handlebar
-            });
-        }
-    }).catch(err => console.log(err)); // To catch no video ID
-});
-
-// Save edited video
-router.put('/saveEditedVideo/:id', (req, res) => {
-    let question = req.body.question;
-    let choiceA = req.body.choiceA;
-    let choiceB = req.body.choiceB;
-    let choiceC = req.body.choiceC;   
-    let correct = req.body.correct;
-    let userId = req.user.id;
-    var quizID = req.params.id;
-
-    Quiz.update({
-        question,
-        choiceA,
-        choiceB,
-        choiceC,
-        correct,
-        userId
-    }, {
-            where: {
-                id: quizID
-            }
-        }).then(() => {
-            // After saving, redirect to router.get(/listVideos...) to retrieve all updated
-            // videos
-            res.redirect('/user/QuizData');
-        }).catch(err => console.log(err));
-});
-
-router.get('/delete/:id', (req, res) => {
-    var quizId = req.params.id;
-    Quiz.findOne({
-        where: {
-            id: quizId
-        }
-    }).then((quizzes) => {
-        console.log("quizIDToDelete.userId : " + quizzes.userId);
-        console.log("req.user.id : " + req.user.id);
-        if (quizzes.userId === req.user.id) {
-            Quiz.destroy({
-                where: {
-                    id: quizId
-                }
-            }).then((quizzes) => {
-                alertMessage(res, 'success', 'Quiz ID ' + quizId + ' successfully deleted.', 'fa fa-hand-peace-o', true);
-                res.redirect('/user/QuizData');
-            }).catch(err => console.log(err));
-        }
-    })
-});
-
-router.post('/ForgetPass', (req, res) => {
-    
-    res.render('../views/user/ForgetPass') // get out of user.js and enter views/user/ForgetPass.handlebars to render
-});
-
-// function sendEmail2(userId, email, token) {
-//     const sgMail = require('@sendgrid/mail');
-//     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-//     const msg = {
-//         to: email,
-//         from: 'Do Not Reply <admin@gmail.com>',
-//         subject: 'Forget Password',
-//         text: 'Your passowrd',
-//         html: 'Your password is <password>',
-//     };
-//     sgMail.send(msg);
-// }
-
-router.post('/AdminLogin', (req, res) => {
-    res.render('../views/user/AdminLogin') // get out of user.js and enter views/user/AdminLogin.handlebars to render
+router.get('/', (req, res) => {
+    const title = 'I\'m at the user router!';
+    res.render('index', { title: title }) // renders views/index.handlebars
 });
 
 router.get('/verify/:userId/:token', (req, res, next) => {
@@ -283,33 +140,31 @@ router.get('/verify/:userId/:token', (req, res, next) => {
         if (user) { // If user is found
             let userEmail = user.email; // Store email in temporary variable
             if (user.verified === true) { // Checks if user has been verified
-                alertMessage(res, 'info', 'User already verified', 'fas fa-exclamation - circle', true);
-                res.redirect('/LoginSignUp');
+                alertMessage(res, 'info', 'User already verified', 'fas fa-exclamation-circle', true);
+                res.redirect('/showLogin');
             } else {
                 // Verify JWT token sent via URL
-                jwt.verify(req.params.token, user.password, (err, authData) => {
+                jwt.verify(req.params.token, 's3cr3Tk3y', (err, authData) => {
                     if (err) {
-                        alertMessage(res, 'danger', 'Unauthorised Access, user unverified.', 'fas fa-exclamation - circle', true);
-                        res.redirect('/LoginSignUp');
+                        alertMessage(res, 'danger', 'Unauthorised Access', 'fas fa-exclamation-circle', true);
+                        res.redirect('/');
                     } else {
-                        User.update(
-                            {
-                                verified: 1
-                            }, {
-                                where: { id: user.id }
-                            }).then(user => {
-                                alertMessage(res, 'success', userEmail + ' verified. Please login', 'fas fa - sign -in -alt', true);
-                                res.redirect('/LoginSignUp');
-                            });
+                        User.update({ verified: 1 }, {
+                            where: { id: user.id }
+                        }).then(user => {
+                            alertMessage(res, 'success', userEmail + ' verified.Please login', 'fas fa-sign-in-alt', true);
+                            res.redirect('/showLogin');
+                        });
                     }
                 });
             }
         } else {
-            alertMessage(res, 'danger', 'Unauthorised Access, user not found.', 'fas fa-exclamation-circle', true);
-            res.redirect('/LoginSignUp');
+            alertMessage(res, 'danger', 'Unauthorised Access', 'fas fa-exclamation-circle', true);
+            res.redirect('/');
         }
     });
 });
+
 
 
 module.exports = router;

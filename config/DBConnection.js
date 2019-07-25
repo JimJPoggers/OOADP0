@@ -1,11 +1,13 @@
 const mySQLDB = require('./DBConfig');
 const user = require('../models/User');
-const quiz = require('../models/Quiz');
+const video = require('../models/Video');
+const Product = require('../models/Products')
+
 // If drop is true, all existing tables are dropped and recreated
 const setUpDB = (drop) => {
     mySQLDB.authenticate()
         .then(() => {
-            console.log('User database connected');
+            console.log('Vidjot database connected');
         })
         .then(() => {
             /*
@@ -13,9 +15,7 @@ const setUpDB = (drop) => {
             In this case the primary key from user will be a foreign key
             in video.
             */
-            user.hasMany(quiz);
-            console.log("USER.HASMANY PASSED");
-
+            user.hasMany(video);
             mySQLDB.sync({ // Creates table if none exists
                 force: drop
             }).then(() => {

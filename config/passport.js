@@ -12,7 +12,7 @@ function localStrategy(passport) {
                     return done(null, false, { message: 'No User Found' });
                 }
                 // Match password
-                // var isSame = bcrypt.compareSync(password, user.password);
+                var isSame = bcrypt.compareSync(password, user.password);
                 bcrypt.compare(password, user.password, (err, isMatch) => {
                     if (err) throw err;
                     if (isMatch) {
