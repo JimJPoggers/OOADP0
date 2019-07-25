@@ -133,7 +133,7 @@ app.listen(port, () => {
 });
 
 // Bring in database connection
-const vidjotDB = require('./config/DBConnection');
+const vidjotDB = require('./asdhjk/DBConnection');
 // Connects to MySQL database
 vidjotDB.setUpDB(false); // To set up database with new tables set (true)
 // Passport Config
