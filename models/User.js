@@ -4,17 +4,20 @@ const db = require('../config/DBConfig');
 Note that Sequelize automatically pleuralizes the entity name as the table name
 */
 const User = db.define('user', {
-    name: {
-        type: Sequelize.STRING
-    },
     email: {
         type: Sequelize.STRING
     },
     password: {
         type: Sequelize.STRING
     },
+    weight: {
+        type: Sequelize.INTEGER
+    },
+    height: {
+        type: Sequelize.INTEGER
+    },
+    verified: {
+        type: Sequelize.BOOLEAN
+    }
 });
 module.exports = User;
-verified: {
-    type: Sequelize.BOOLEAN
-   }

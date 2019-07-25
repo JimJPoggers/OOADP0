@@ -1,0 +1,74 @@
+<!-- from https://www.youtube.com/watch?v=mweMAsVhhy0&t=152s [loginSignupForm] -->
+<!-- from https://codepen.io/Sohail05/pen/yOpeBm [eye icon]-->
+
+<html>
+    <head>
+        <link href="../css/LSFpage.css" rel="stylesheet"/>
+        <script src="../js/jquery-1.10.2.min.js"></script>
+        <script src="../js/JQUERY%20Main.js"></script>
+        <title>Login / Sign Up</title>
+    </head>
+    <body>
+        <div id="box">
+            <div id="main"></div>
+            
+            <form action="../user/LoginSignUp" method="post" class = "registerForm">
+                <div id="signupform">
+                    <h1>SIGN UP</h1>
+                    <input type="email" name="email" id="email" placeholder="Email" title = "Only Gmail accepted!" pattern = ".+@gmail.com" required value="{{email}}"/><br>
+                    
+                    <div>
+                        <input id = "password-field" type="password" name="password" placeholder="Password" title = "Password must be minimum eight characters, one uppercase, one lowercase and at least one number!" minlength = "8" pattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$" required value="{{password}}">
+                        <span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+                        <br>
+                    </div>
+                    <input type="text" name="weight" placeholder="Weight (kg)" title = "Weight in Kilograms (kg), only numbers allowed" pattern = "^[0-9]*$" required value="{{weight}}"/><br>
+                    <input type="text" name="height" placeholder="Height (cm)" title = "Height in Centimetre (cm), only numbers allowed" pattern = "^[0-9]*$" required value="{{height}}" /><br>
+                    <button id = "submitb" class = "registerButton" type="submit">SIGN UP</button>
+                </div>
+            </form>
+            
+            <form action="../user/quiz" method="post" class ="loginForm">
+                <div id="loginform">
+                    <h1>LOGIN</h1>
+                    <input type="email" name="email" id="email" placeholder="Email" required value="{{email}}"/><br>
+                    <div>
+                        <input id = "password-field" type="password"  name="password" placeholder="Password" required value="{{password}}">
+                        <!--<span toggle="#password-field" class="fa fa-fw fa-eye field-icon1 toggle-password"></span>-->
+                        <br><br>
+                    </div>
+                    <p>Forget Password? Click <a href = "/ForgetPass" style = "text-decoration: none;">here!</a></p>
+                    <p>Login as <a href = "/AdminLogin" style = "text-decoration: none;">Admin</a></p>
+                    <button id = "submitb" class = "loginButton" type="submit">LOGIN</button>
+                </div>
+            </form>
+
+            <div id="signup_msg">Don't have an account?</div>
+            <div id="login_msg">Have an account?</div>
+            
+            <button id="signup_btn">SIGN UP</button>
+            <button id="login_btn">LOGIN</button>            
+            
+        </div>
+
+        <script>
+            $(".toggle-password").click(function() {
+
+            $(this).toggleClass("fa-eye fa-eye-slash");
+            var input = $($(this).attr("toggle"));
+            if (input.attr("type") == "password") {
+                input.attr("type", "text");
+            } else {
+                input.attr("type", "password");
+            }
+            });
+
+             $('button.registerButton').click( function() {
+                $('form.registerForm').submit();
+            });
+            $('button.loginButton').click( function() {
+                $('form.loginForm').submit();
+            });
+        </script>
+    </body>
+</html>

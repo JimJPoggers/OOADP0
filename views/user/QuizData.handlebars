@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>Quiz Data</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+</head>
+
+<body>
+	<table style="width: 100%">
+		<div class="row" style ="margin-top: 5%;">
+			<div class="col-12 col-sm-8 col-md-8 col-lg-8">
+				<h1>Data page for Quiz</h1>
+			</div>		
+		</div>
+		{{#if quizzes}}
+		<tr>
+			<th>Questions</th>
+			<th>Choice A</th>
+			<th>Choice B</th>
+			<th>Choice C</th>
+			<th>Correct Answer</th>
+		</tr>
+		{{#each quizzes}}
+		<tr>
+			<td>{{question}}</td>
+			<td>{{choiceA}}</td>
+			<td>{{choiceB}}</td>
+			<td>{{choiceC}}</td>
+			<td>{{correct}}</td>
+			<td><a href="/user/edit/{{id}}"><button class="btn btn-primary" style="">Edit</button></a>
+				<a href="/user/delete/{{id}}" data-toggle="confirmation" data-title="Confirm delete?"><button class="btn btn-primary" style="">Delete</button></a>
+			</td>	
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		{{/each}}
+		</div>
+		{{else}}
+		<h3>No user input</h3>
+		{{/if}}
+		</div>
+		</div>
+	</table>
+</body>
+
+</html>

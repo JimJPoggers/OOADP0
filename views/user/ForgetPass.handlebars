@@ -1,0 +1,36 @@
+<html>
+    <head>
+        <link href="../css/LSFpage.css" rel="stylesheet"/>
+        <script src="../js/jquery-1.10.2.min.js"></script>
+        <title>Forget Password</title>
+    </head>
+    <body>
+        <div id="box" class = "flip">
+            <div id="main1"></div>           
+            <form action="../user/ForgetPass" method="post">
+                <div id="fpform">
+                    <h1>Forget Password</h1>
+                    <p>Use your email to get it back!</p>  
+                    <input type="email" name="email" id="email" placeholder="Email" value="{{email}}"/><br><br>
+                    <p>Forget Email? Create <a href = "/LoginSignUp" style = "text-decoration: none;">here!</a></p>              
+                    <button id = "submitb" type="submit">Submit</button>
+                </div>
+            </form>
+
+            <div id="signupform">
+                <h1>John Doe</h1> 
+                <p>Architect & Engineer</p> 
+                <p>We love that guy</p>
+            </div>
+
+        </div>
+    </body>
+
+    <script>
+        $(function(){
+            $(".flip").flip({
+                trigger: 'click'
+            });
+        });
+    </script>        
+</html>
