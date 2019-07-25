@@ -10,30 +10,21 @@ const methodOverride = require('method-override');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const flash = require('connect-flash');
-const FlashMessenger = require('flash-messenger');// Library to use MySQL to store session objects
+const FlashMessenger = require('flash-messenger');
 const MySQLStore = require('express-mysql-session');
 const db = require('./config/db'); // db.js config file
-const passport = require('passport');
-
 /*
 * Loads routes file main.js in routes directory. The main.js determines which function
 * will be called based on the HTTP request and URL.
 */
 const mainRoute = require('./routes/main');
 const userRoute = require('./routes/user');
-const videoRoute = require('./routes/video');
-const creditcardRoute = require('./routes/creditcard');
-const productRoute = require('./routes/product')
-// Bring in Handlebars Helpers hereee
-// Copy and paste this statement only!!
-const { formatDate, radioCheck, replaceCommas } = require('./helpers/hbs');
 
 /*
 * Creates an Express server - Express is a web application framework for creating web applications
 * in Node JS.
 */
 const app = express();
-
 // Handlebars Middleware
 /*
 * 1. Handlebars is a front-end web templating engine that helps to create dynamic web pages using variables
@@ -45,11 +36,6 @@ const app = express();
 *
 * */
 app.engine('handlebars', exphbs({
-	helpers: {
-		formatDate: formatDate,
-		radioCheck: radioCheck,
-		replaceCommas: replaceCommas
-	},
 	defaultLayout: 'main' // Specify default template views/layout/main.handlebar 
 }));
 app.set('view engine', 'handlebars');
@@ -85,25 +71,12 @@ app.use(session({
 		// The maximum age of a valid session; milliseconds:
 		expiration: 900000,
 	}),
-
 	resave: false,
 	saveUninitialized: false,
 }));
-// Initilize Passport middleware
-app.use(passport.initialize());
-app.use(passport.session());
-
-
-app.use(flash());
 
 app.use(FlashMessenger.middleware); // add this statement after flash()
-app.use(function (req, res, next) {
-	res.locals.success_msg = req.flash('success_msg');
-	res.locals.error_msg = req.flash('error_msg');
-	res.locals.error = req.flash('error');
-	res.locals.user = req.user || null;
-	next();
-});
+
 
 // Place to define global variables - not used in practical 1
 app.use(function (req, res, next) {
@@ -118,14 +91,13 @@ app.use(function (req, res, next) {
 app.use('/', mainRoute); // mainRoute is declared to point to routes/main.js
 // This route maps the root URL to any path defined in main.js
 app.use('/user', userRoute); // mainRoute is declared to point to routes/main.js
-app.use('/video', videoRoute);
-app.use('/creditcard',creditcardRoute)
-app.use('/product', productRoute)
+
+app.use(flash());
 /*
 * Creates a unknown port 5000 for express server since we don't want our app to clash with well known
-* ports such as 80 or 8080.456789iopiop
+* ports such as 80 or 8080.
 * */
-const port = 1000;
+const port = 5000;
 
 // Starts the server and listen to port 5000
 app.listen(port, () => {
@@ -134,11 +106,5 @@ app.listen(port, () => {
 
 // Bring in database connection
 const vidjotDB = require('./config/DBConnection');
-addEventListener
-asd
-asd
 // Connects to MySQL database
-vidjotDB.setUpDB(false); // To set up database with new tables set (true)
-// Passport Config
-const authenticate = require('./config/passport');
-authenticate.localStrategy(passport);
+vidjotDB.setUpDB(true); // To set up database with new tables set (true)
