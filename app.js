@@ -123,7 +123,7 @@ app.use('/creditcard',creditcardRoute)
 app.use('/product', productRoute)
 /*
 * Creates a unknown port 5000 for express server since we don't want our app to clash with well known
-* ports such as 80 or 8080.
+* ports such as 80 or 8080.777
 * */
 const port = 1000;
 
