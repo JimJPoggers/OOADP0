@@ -1,0 +1,181 @@
+body{
+    margin: 0px;
+    padding: 0px;
+    background-image: url('../img/bread.jpg');
+    background-attachment: fixed;
+	background-size: cover;
+	background-position: center;
+}
+#box{
+    height: 200px;
+    width: 1000px;
+    background-color:#2D2D2D;
+    border-radius: 5px;
+    position: absolute;
+    top:50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+#main{
+    height: 450px;
+    width: 430px;
+    background-color:white;
+    border-radius: 5px;
+    position: absolute;
+    top:50%;
+    left: 70%;
+    transform: translate(-50%,-50%);
+    z-index: 99;
+}
+#main1{
+    height: 300px;
+    width: 430px;
+    background-color:white;
+    border-radius: 5px;
+    position: absolute;
+    top:50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    z-index: 99;
+}
+#BMIMain{
+    height: 500px;
+    width: 830px;
+    background-color:white;
+    border-radius: 5px;
+    position: absolute;
+    top:50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    z-index: -1;
+}
+#loginform,#signupform{
+    position: absolute;
+    top:50%;
+    left: 70%;
+    transform: translate(-50%,-50%);
+    z-index: 999;
+}
+#fpform {
+    position: absolute;
+    top:50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    z-index: 999;
+}
+#BMI {
+    max-width: 600px;
+    margin: auto;
+    margin-top: 5%;
+    overflow: hidden;
+    padding: 26px 26px;
+}
+#BMI .img {
+    float: left;
+    margin: 0 21px 0 0;
+}
+#BMI #btn, #BMI #btnS {
+    background: #ed7954;
+    text-decoration: none;
+    color: #fff!important;
+    box-shadow: 0 0 2px #aaa;
+    -webkit-box-shadow: 0 0 2px #aaa;
+}
+#loginform{
+    top:50%;
+    left: 75%;
+    visibility: hidden;
+}
+#loginform h1,#signupform h1, #fpform h1{
+    font-family: arial;
+    font-size: 25px;
+    color:turquoise;
+}
+#loginform input,#signupform input, #fpform input{
+    height: 38px;
+    width: 300px;
+    border: 0px;
+    outline: none;
+    border-bottom: 1px solid black;
+    margin: 5px;
+}
+#fpform input {
+    margin: 0;
+}
+#fpform button {
+    height: 35px;
+    width: 130px;
+    background-color:turquoise;
+    font-family: monospace;
+    font-size: 16px;
+    color:white;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    margin-left: 175px;
+    margin-top: 10px;
+}
+#loginform button,#signupform button {
+    height: 35px;
+    width: 130px;
+    background-color:turquoise;
+    font-family: monospace;
+    font-size: 16px;
+    color:white;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    margin-top: 30px;
+    margin-left: 175px;
+}
+#login_btn,#signup_btn{
+    height: 35px;
+    width: 120px;
+    background-color:transparent;
+    color:white;
+    border:1px solid white;
+    border-radius: 5px;
+    outline: none;
+    position: absolute;
+    left: 75%;
+    top:65%;
+    transform: translate(-50%,-50%);
+    transition: all .5s;
+}
+#login_msg,#signup_msg{
+    font-family: arial;
+    font-size: 25px;
+    color:white;
+    position: absolute;
+    top:35%;
+    left: 75%;
+    transform: translate(-50%,-50%);
+    z-index: 1;
+}
+#signup_msg {
+    width: 27%;
+}
+#login_msg{
+    left: 25%;
+}
+#login_btn{
+    left: 25%;
+}
+#login_btn:hover,#signup_btn:hover{
+    background-color:white;
+    color:#2d2d2d;
+    cursor: pointer;
+}
+
+.field-icon {
+    float: right;
+    margin-right: 18px;
+    margin-top: -28px;
+    position: relative;
+    z-index: 2;
+}
+
+.field-icon1 {
+    margin-right: 25px;
+    z-index: 2;
+} 
